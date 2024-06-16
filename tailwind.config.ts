@@ -19,6 +19,9 @@ const config = {
       },
     },
     extend: {
+      boxShadow: {
+        custom: "0 0 31px 2px hsl(var(--primary-50))",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
