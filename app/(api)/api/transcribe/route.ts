@@ -8,7 +8,7 @@ export async function GET(req: Request) {
   if (!videoId) {
     return NextResponse.json(
       { error: "Video ID is required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -19,7 +19,8 @@ export async function GET(req: Request) {
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to fetch transcript" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
+cls;
