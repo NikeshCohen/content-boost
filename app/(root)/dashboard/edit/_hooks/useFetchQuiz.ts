@@ -1,5 +1,4 @@
 import { getQuizById } from "@/database/queries";
-import { Quiz } from "@/database/schemas/schema";
 import { useState } from "react";
 
 export const useFetchQuiz = () => {

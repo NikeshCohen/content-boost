@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unescaped-entities */
+
 "use client";
 
 import { Quiz } from "@/database/schemas/schema";
@@ -7,13 +9,14 @@ import Loader from "@/components/ui/loader";
 import { Question } from "@/types";
 
 function Page({ params }: { params: { quizId: string } }) {
-  const [quizData, setQuizData] = useState<Quiz | null>(null);
+  const [quizData, setQuizData] = useState<Quiz | null>();
   const [quizQuestions, setQuizQuestions] = useState<Question[] | null>(null);
   const { isFetching, error, fetchQuiz } = useFetchQuiz();
 
   useEffect(() => {
     const fetchData = async () => {
       const data = (await fetchQuiz(params.quizId)) as Quiz;
+      if (!data) return;
       const parsedQuestions = JSON.parse(data.quizContent);
       setQuizQuestions(parsedQuestions);
       setQuizData(data);
@@ -22,7 +25,7 @@ function Page({ params }: { params: { quizId: string } }) {
     fetchData();
   }, []);
 
-  if (isFetching || quizQuestions === null) {
+  if (isFetching) {
     return (
       <div className="flex h-[85vh] w-full items-center justify-center">
         <Loader />
