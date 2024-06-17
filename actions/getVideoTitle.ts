@@ -1,16 +1,7 @@
-import { NextResponse } from "next/server";
+"use server";
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const videoId = searchParams.get("videoId");
-
-  if (!videoId) {
-    return NextResponse.json(
-      { error: "Video ID is required" },
-      { status: 400 }
-    );
-  }
-
+export async function getVideoTitle(videoId: string) {
+  "use server";
   try {
     const res = await fetch(`https://www.youtube.com/watch?v=${videoId}`);
     if (!res.ok) {
@@ -20,16 +11,16 @@ export async function GET(req: Request) {
     const titleMatch = html.match(/<title>(.*?)<\/title>/i);
 
     if (titleMatch) {
-      return NextResponse.json({ videoTitle: titleMatch[1] });
+      return { videoTitle: titleMatch[1] };
     } else {
-      return NextResponse.json({
+      return {
         videoTitle: "No title found, ignore this text",
-      });
+      };
     }
   } catch (error) {
     console.error(error);
-    return NextResponse.json({
+    return {
       videoTitle: "No title found, ignore this text",
-    });
+    };
   }
 }

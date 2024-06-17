@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -22,6 +21,9 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { useCreateQuiz } from "./_hooks/useCreateQuiz";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const youtubeUrlSchema = z
   .string()
@@ -44,7 +46,7 @@ const youtubeUrlSchema = z
   );
 
 const FormSchema = z.object({
-  username: youtubeUrlSchema,
+  videoUrl: youtubeUrlSchema,
   quizName: z.string().optional(),
   quizSize: z
     .number()
@@ -56,22 +58,32 @@ const FormSchema = z.object({
 });
 
 function Page() {
+  const router = useRouter();
+  const { generating, error, handleCreateQuiz } = useCreateQuiz();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      username: "",
+      videoUrl: "",
       quizName: "",
-      quizSize: 1,
+      quizSize: 5,
       difficulty: "Easy",
     },
   });
 
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    alert("submitted");
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    const quizId = await handleCreateQuiz(data);
+
+    if (error) {
+      console.error(error);
+      toast.error(error);
+      return;
+    }
+
+    router.push(`/dashboard/edit/${quizId}`);
   };
 
   return (
-    <>
+    <div className="flex flex-col items-center">
       <h1 className="pb-8 text-3xl">Create New Quiz</h1>
       <Form {...form}>
         <form
@@ -80,7 +92,7 @@ function Page() {
         >
           <FormField
             control={form.control}
-            name="username"
+            name="videoUrl"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>YouTube URL</FormLabel>
@@ -90,9 +102,6 @@ function Page() {
                     {...field}
                   />
                 </FormControl>
-                <FormDescription>
-                  The video you would like to create the quiz from
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -115,12 +124,12 @@ function Page() {
             name="quizSize"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Quiz Size</FormLabel>
+                <FormLabel>Number of questions</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
-                    min="1"
-                    placeholder="Enter quiz size"
+                    min="5"
+                    placeholder="Number of questions"
                     {...field}
                   />
                 </FormControl>
@@ -150,10 +159,12 @@ function Page() {
               </FormItem>
             )}
           />
-          <Button type="submit">Create Quiz</Button>
+          <Button type="submit" disabled={generating}>
+            {generating ? "Generating..." : "Create Quiz"}
+          </Button>
         </form>
       </Form>
-    </>
+    </div>
   );
 }
 
